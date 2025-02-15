@@ -5,7 +5,15 @@ const API_HOST = 'ai-content-detector-ai-gpt.p.rapidapi.com';
 
 export async function POST(request: Request) {
   try {
-    const { text } = await request.json();
+    const body = await request.json();
+    const { text } = body;
+
+    if (!text) {
+      return new Response(JSON.stringify({ error: 'Text is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const response = await fetch('https://ai-content-detector-ai-gpt.p.rapidapi.com/api/detectText/', {
       method: 'POST',
@@ -19,7 +27,18 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to detect AI content' }, { status: 500 });
+  } catch (err) {
+    console.error('Error processing request:', err);
+    
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        details: err instanceof Error ? err.message : 'Unknown error'
+      },
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 } 
