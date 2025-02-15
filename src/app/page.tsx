@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { DetectionResult } from './types';
 
 export default function Home() {
   const [text, setText] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<DetectionResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
