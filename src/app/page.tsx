@@ -21,6 +21,7 @@ export default function Home() {
       });
       
       const data = await response.json();
+      console.log(data);
       setResult(data);
     } catch (error) {
       console.error('Error:', error);
@@ -47,18 +48,68 @@ export default function Home() {
           disabled={loading}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
-          {loading ? 'Analyzing...' : 'Analyze Text'}
+          {loading ? 'Analyzing...' : 'Detect AI Content'}
         </button>
       </form>
 
       {result && (
         <div className="mt-8 p-4 border rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Results:</h2>
-          <pre className="whitespace-pre-wrap">
-            {JSON.stringify(result, null, 2)}
-          </pre>
+          <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <div className="w-48 font-medium">AI Probability:</div>
+              <div className="flex-1">
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div 
+                    className={`h-4 rounded-full ${
+                      result.fakePercentage < 50 ? 'bg-green-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${result.fakePercentage}%` }}
+                  ></div>
+                </div>
+                <div className="mt-1 text-sm">
+                  {result.fakePercentage.toFixed(1)}%
+                </div>
+              </div>
+            </div>
+
+            <div className="flex">
+              <div className="w-48 font-medium">Classification:</div>
+              <div className={`${
+                result.isHuman ? 'text-green-600' : 'text-red-600'
+              } font-semibold`}>
+                {result.isHuman ? 'Likely Human-Written' : 'Likely AI-Generated'}
+              </div>
+            </div>
+
+            <div className="flex">
+              <div className="w-48 font-medium">Word Analysis:</div>
+              <div>
+                {result.aiWords} AI-like words out of {result.textWords} total words
+              </div>
+            </div>
+
+            {result.sentences && result.sentences.length > 0 && (
+              <div className="flex flex-col">
+                <div className="w-48 font-medium mb-2">Detailed Feedback:</div>
+                <ul className="list-disc pl-6 space-y-2">
+                  {result.sentences.map((sentence, index) => (
+                    <li key={index}>{sentence}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {result.otherFeedback && (
+              <div className="flex">
+                <div className="w-48 font-medium">Additional Notes:</div>
+                <div>{result.otherFeedback}</div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </main>
   );
 }
+
